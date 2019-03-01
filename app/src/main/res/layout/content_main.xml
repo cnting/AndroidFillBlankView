@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:showIn="@layout/activity_main"
+        tools:context=".MainActivity">
+    <com.cnting.fillblankview.FillBlankView android:layout_width="match_parent"
+                                            app:layout_constraintTop_toTopOf="parent"
+                                            app:layout_constraintStart_toStartOf="parent"
+                                            app:fill_text="我是个________学生,我有一个梦想，我要成为像____，____一样的人."
+                                            app:fill_split="____"
+                                            app:fill_text_color="@android:color/darker_gray"
+                                            android:layout_marginTop="20dp"
+                                            app:fill_text_size="17sp"
+                                            app:underline_focus_color="@android:color/holo_red_dark"
+                                            app:underline_unfocus_color="@android:color/holo_blue_dark"
+                                            android:layout_height="wrap_content"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

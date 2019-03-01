@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FillBlankView">
+        <attr name="fill_text" format="string"/>
+        <attr name="fill_split" format="string"/>
+        <attr name="fill_text_size" format="dimension"/>
+        <attr name="fill_text_color" format="color"/>
+        <attr name="underline_focus_color" format="color"/>
+        <attr name="underline_unfocus_color" format="color"/>
+        <attr name="underline_fixed_width_size" format="dimension"/> <!--下划线的宽度-->
+        <attr name="underline_fixed_width" format="boolean"/> <!--下划线是否固定宽度-->
+    </declare-styleable>
+</resources>
