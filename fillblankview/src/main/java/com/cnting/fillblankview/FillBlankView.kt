@@ -2,6 +2,7 @@ package com.cnting.fillblankview
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
 import android.text.*
@@ -79,7 +80,18 @@ class FillBlankView : RelativeLayout {
         fillBlankTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize.toFloat())
         fillBlankTextView.setTextColor(textColor)
         fillBlankTextView.movementMethod = UnderlineLinkMovementMethod()
+        fillBlankEditText.onFocusChangeListener = OnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus && lastSpan != null) {
+                lastSpan?.spanText = fillBlankEditText.text.toString()
+                lastSpan?.focusChange(false)
+                fillBlankEditText.setText("")
+                fillBlankEditText.visibility = View.INVISIBLE
+                lastSpan = null
+                fillBlankTextView.invalidate()
+            }
+        }
     }
+
 
     private fun doFillBlank() {
         if (fillSplit.isNotEmpty()) {
@@ -132,6 +144,7 @@ class FillBlankView : RelativeLayout {
             if (!isEnabled) {
                 return
             }
+            fillBlankEditText.visibility = View.VISIBLE
             if (lastSpan != span) {
                 fillTextOnLoseFocus()
             }
@@ -147,6 +160,7 @@ class FillBlankView : RelativeLayout {
         lastSpan = span
         fillBlankEditText.setText(span.spanText)
         fillBlankEditText.setSelection(span.spanText.length)
+        span.spanText = ""
         //计算当前EditText应该显示的位置
         val rectF = drawSpanRect(span)
         layoutEditTextPosition(rectF)
@@ -213,4 +227,9 @@ class FillBlankView : RelativeLayout {
         this.showRightAnswer = showRightAnswer
         doFillBlank()
     }
+
+    fun getUserAnswers(): List<String> {
+        return spanList.map { it.spanText }
+    }
+
 }

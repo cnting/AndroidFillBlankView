@@ -1,12 +1,14 @@
 package com.cnting.android_fillblankview
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 import com.cnting.fillblankview.FillBlankTagUtil
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,6 +21,18 @@ class MainActivity : AppCompatActivity() {
         init3()
         init4()
 
+        fab.setOnClickListener {
+            val stringBuilder = StringBuilder()
+            stringBuilder.append("1:\n")
+            stringBuilder.append(fillBlankView1.getUserAnswers().joinToString(",") + "\n")
+            stringBuilder.append("2:\n")
+            stringBuilder.append(fillBlankView2.getUserAnswers().joinToString(",") + "\n")
+            stringBuilder.append("3:\n")
+            stringBuilder.append(fillBlankView3.getUserAnswers().joinToString(",") + "\n")
+            stringBuilder.append("4:\n")
+            stringBuilder.append(fillBlankView4.getUserAnswers().joinToString(",") + "\n")
+            Log.d("FillBlank", stringBuilder.toString())
+        }
     }
 
     private fun init2() {
