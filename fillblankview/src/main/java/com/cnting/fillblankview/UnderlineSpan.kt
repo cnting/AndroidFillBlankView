@@ -7,6 +7,7 @@ import android.text.Spannable
 import android.text.TextPaint
 import android.text.TextUtils
 import android.text.style.ReplacementSpan
+import android.util.Log
 import android.widget.TextView
 
 /**
@@ -16,8 +17,7 @@ import android.widget.TextView
 class UnderlineSpan(
     private val underlineFocusColor: Int,
     private val underlineUnFocusColor: Int,
-    private val isFixedUnderlineWidth: Boolean,
-    private val fixedWidth: Int
+    private val isFixedUnderlineWidth: Boolean  //是否固定下划线宽度
 ) : ReplacementSpan() {
 
     /**
@@ -27,6 +27,7 @@ class UnderlineSpan(
     var spanId: Int = 0
     var underlineWidth = 80
     var clickListener: ClickSpanListener? = null
+    var rightAnswers: String? = null  //正确答案，用逗号分割
     private var drawPaint = Paint()
     private val linePaint = Paint()
 
@@ -36,10 +37,17 @@ class UnderlineSpan(
         linePaint.strokeWidth = 2f
     }
 
+    fun setFixedWidth(fixedWidth: Int) {
+        if (isFixedUnderlineWidth) {
+            underlineWidth = fixedWidth
+        }
+    }
+
     /**
      * @return Span替换文字或所占的宽度
      */
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
+        underlineWidth = getUnderlineWidth(paint)
         return underlineWidth
     }
 
@@ -64,6 +72,7 @@ class UnderlineSpan(
                 underlineWidth.toFloat(),
                 TextUtils.TruncateAt.END
             )  //填写被截断后的内容
+
         var width = paint.measureText(ellipsize, 0, ellipsize.length)
         width = (underlineWidth - width) / 2
 
@@ -72,6 +81,24 @@ class UnderlineSpan(
 
         linePaint.color = drawPaint.color
         canvas.drawLine(x, y1, x + underlineWidth, y1, linePaint)   //绘制下划线
+    }
+
+    /**
+     * 如果不固定下划线宽度，需要根据最长答案计算
+     */
+    private fun getUnderlineWidth(paint: Paint): Int {
+        if (!isFixedUnderlineWidth && rightAnswers?.isNotEmpty() == true) {
+            val answers = rightAnswers!!.split(";")
+            var maxLengthAnswer = answers[0]
+            (0 until answers.size)
+                .forEach {
+                    if (answers[it].length > maxLengthAnswer.length) {
+                        maxLengthAnswer = answers[it]
+                    }
+                }
+            return paint.measureText(maxLengthAnswer).toInt() + 30
+        }
+        return underlineWidth
     }
 
     fun onClick(textView: TextView, buffer: Spannable, isDown: Boolean, x: Int, y: Int, line: Int, off: Int) {

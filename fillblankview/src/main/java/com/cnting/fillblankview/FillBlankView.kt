@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.RectF
 import android.os.Build
 import android.text.*
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -19,12 +20,6 @@ import kotlinx.android.synthetic.main.view_fill_blank.view.*
  */
 class FillBlankView : RelativeLayout {
 
-    companion object {
-        private val LOG_TAG = "FillBlankView"
-        private val UNDERLINE_TAG = "&nbsp;<blank>&nbsp;"
-        private val UNDERLINE_TAG_NAME = "blank"
-    }
-
     //显示内容
     private var fillContent: String = ""
     //下划线分隔符
@@ -33,6 +28,7 @@ class FillBlankView : RelativeLayout {
     private var textSize: Int = 20
     private var underlineFocusColor: Int = Color.BLACK
     private var underlineUnFocusColor: Int = Color.BLACK
+    private var rightAnswerColor: Int = Color.BLACK
     private var isFixedUnderlineWidth: Boolean = true
     private var underlineFixedWidth: Int = 100
     //下划线集合
@@ -43,6 +39,7 @@ class FillBlankView : RelativeLayout {
     private var fontTop = 0f
     private var fontBottom = 0f
     private var immFocus: ImmFocus? = null
+    private var showRightAnswer = false
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
@@ -53,22 +50,20 @@ class FillBlankView : RelativeLayout {
         init(context, attrs)
     }
 
-
-    init {
-        Log.d(LOG_TAG, "init{}")
-    }
-
     private fun init(context: Context?, attrs: AttributeSet?) {
         View.inflate(context, R.layout.view_fill_blank, this)
         val array = context?.obtainStyledAttributes(attrs, R.styleable.FillBlankView)
         fillContent = array?.getString(R.styleable.FillBlankView_fill_text) ?: ""
         fillSplit = array?.getString(R.styleable.FillBlankView_fill_split) ?: ""
-        textColor = array?.getColor(R.styleable.FillBlankView_fill_text_color, Color.BLACK) ?: Color.BLACK
+        textColor = array?.getColor(R.styleable.FillBlankView_fill_text_color, textColor) ?: textColor
         textSize = array?.getDimensionPixelSize(R.styleable.FillBlankView_fill_text_size, textSize) ?: textSize
         underlineFocusColor =
-            array?.getColor(R.styleable.FillBlankView_underline_focus_color, Color.BLACK) ?: Color.BLACK
+            array?.getColor(R.styleable.FillBlankView_underline_focus_color, underlineFocusColor) ?: underlineFocusColor
         underlineUnFocusColor =
-            array?.getColor(R.styleable.FillBlankView_underline_unfocus_color, Color.BLACK) ?: Color.BLACK
+            array?.getColor(R.styleable.FillBlankView_underline_unfocus_color, underlineUnFocusColor)
+                ?: underlineUnFocusColor
+        rightAnswerColor =
+            array?.getColor(R.styleable.FillBlankView_right_answer_color, rightAnswerColor) ?: rightAnswerColor
         isFixedUnderlineWidth = array?.getBoolean(R.styleable.FillBlankView_underline_fixed_width, true) ?: true
         underlineFixedWidth =
             array?.getDimensionPixelSize(R.styleable.FillBlankView_underline_fixed_width_size, underlineFixedWidth)
@@ -83,29 +78,48 @@ class FillBlankView : RelativeLayout {
     private fun initView() {
         fillBlankTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize.toFloat())
         fillBlankTextView.setTextColor(textColor)
+        fillBlankTextView.movementMethod = UnderlineLinkMovementMethod()
     }
 
     private fun doFillBlank() {
-        fillBlankTextView.movementMethod = UnderlineLinkMovementMethod()
-        fillContent = fillContent.replace(fillSplit, UNDERLINE_TAG)
+        if (fillSplit.isNotEmpty()) {
+            fillContent = FillBlankTagUtil.splitToBlank(fillContent, fillSplit)
+        }
         val spanned = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(fillContent, Html.FROM_HTML_MODE_LEGACY, null, tagHandler)
+            Html.fromHtml(fillContent, Html.FROM_HTML_MODE_LEGACY, imageGetter, tagHandler)
         } else {
-            Html.fromHtml(fillContent, null, tagHandler)
+            Html.fromHtml(fillContent, imageGetter, tagHandler)
         }
 
         fillBlankTextView.text = spanned
     }
 
+    private val imageGetter by lazy { FillBlankImageGetter(context) }
+
     private val tagHandler = Html.TagHandler { opening, tag, output, xmlReader ->
-        if (tag.equals(UNDERLINE_TAG_NAME, true) && opening) {
+        if (tag.equals(FillBlankTagUtil.TAG_BLANK, true) && opening) {
+            val attrs = FillBlankTagUtil.processAttribute(xmlReader)
+            val rightAnswers = attrs[FillBlankTagUtil.ATTR_RIGHT_ANSWER]
             val span =
-                UnderlineSpan(underlineFocusColor, underlineUnFocusColor, isFixedUnderlineWidth, underlineFixedWidth)
+                UnderlineSpan(underlineFocusColor, underlineUnFocusColor, isFixedUnderlineWidth || rightAnswers == null)
+            span.setFixedWidth(underlineFixedWidth)
+            span.rightAnswers = rightAnswers
             span.clickListener = clickSpanListener
             span.spanText = ""
             span.spanId = spanList.size
             spanList.add(span)
             output.setSpan(span, output.length - 1, output.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            if (showRightAnswer) {
+                val spannableString = SpannableString("($rightAnswers)")
+                spannableString.setSpan(
+                    ForegroundColorSpan(rightAnswerColor),
+                    0,
+                    spannableString.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                output.append(spannableString)
+            }
         }
     }
 
@@ -115,6 +129,9 @@ class FillBlankView : RelativeLayout {
 
     private val clickSpanListener = object : UnderlineSpan.ClickSpanListener {
         override fun onClick(textView: TextView, spanId: Int, span: UnderlineSpan) {
+            if (!isEnabled) {
+                return
+            }
             if (lastSpan != span) {
                 fillTextOnLoseFocus()
             }
@@ -192,5 +209,8 @@ class FillBlankView : RelativeLayout {
         doFillBlank()
     }
 
-
+    fun showRightAnswer(showRightAnswer: Boolean) {
+        this.showRightAnswer = showRightAnswer
+        doFillBlank()
+    }
 }

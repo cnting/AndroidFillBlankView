@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Android-FillBlankView</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">填空题</string>
 </resources>
