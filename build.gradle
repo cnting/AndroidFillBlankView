@@ -10,6 +10,10 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0-alpha06'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+//        classpath 'com.novoda:bintray-release:0.9'
+//        classpath "guru.stefma.bintrayrelease:bintrayrelease:1.1.2"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -19,10 +23,23 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+        maven{ url 'https://dl.bintray.com/cnting77/maven'}
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+//最好加上全局编码设置
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet') //忽略javadoc错误
+    options{
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        links "http://docs.oracle.com/javase/7/docs/api"
+    }
+}
+//kotlin类库上传
+//非常重要 要不它不认识你的项目.kt文件名 其中airpurgeview是你的library名
+//tasks.getByPath(":fillblankview:releaseAndroidJavadocs").enabled = false

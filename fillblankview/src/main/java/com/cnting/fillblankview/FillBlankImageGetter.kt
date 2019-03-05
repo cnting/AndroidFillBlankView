@@ -7,7 +7,7 @@ import androidx.appcompat.content.res.AppCompatResources
 
 /**
  * Created by cnting on 2019-03-04
- * https://blog.csdn.net/u010418593/article/details/9324101
+ * 参考：https://blog.csdn.net/u010418593/article/details/9324101
  */
 internal class FillBlankImageGetter(private val context: Context) : Html.ImageGetter {
 
