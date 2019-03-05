@@ -11,15 +11,15 @@ object FillBlankTagUtil {
     const val TAG_BLANK = "fillblank"
     const val ATTR_RIGHT_ANSWER = "rightanswer"
     const val ATTR_USER_ANSWER = "useranswer"
+    const val RIGHT_ANSWER_SPLIT = "/"
 
     /**
-     * 拼接成<fillblank rightanswer='answer1;answer2;answer3' userAnswer='userAnswer'>
+     * 拼接成<fillblank rightanswer='answer1/answer2/answer3' userAnswer='userAnswer'>
      * 一个空可能有多个正确答案
      */
-    fun blankToHtml(rightAnswers: List<String>/*, userAnswer: String*/): String {
-        val answers = rightAnswers.joinToString(";")
-//        return "<$TAG_BLANK $ATTR_RIGHT_ANSWER='$answers'> $ATTR_USER_ANSWER='$userAnswer'"
-        return "&nbsp;<$TAG_BLANK $ATTR_RIGHT_ANSWER='$answers'>&nbsp;"
+    fun blankToHtml(rightAnswers: List<String>, userAnswer: String = ""): String {
+        val answers = rightAnswers.joinToString(RIGHT_ANSWER_SPLIT)
+        return "&nbsp;<$TAG_BLANK $ATTR_RIGHT_ANSWER='$answers' $ATTR_USER_ANSWER='$userAnswer'>&nbsp;"
     }
 
     /**

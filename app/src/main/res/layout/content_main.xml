@@ -100,7 +100,7 @@
             app:underline_unfocus_color="@android:color/holo_blue_dark"
             app:underline_fixed_width="true"
             android:id="@+id/fillBlankView4"
-            app:right_answer_color="@android:color/holo_green_dark"
+            app:right_answer_color="#33CF85"
             app:underline_fixed_width_size="100dp"
             android:layout_height="wrap_content"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

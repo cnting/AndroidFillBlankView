@@ -29,7 +29,8 @@ class FillBlankView : RelativeLayout {
     private var textSize: Int = 20
     private var underlineFocusColor: Int = Color.BLACK
     private var underlineUnFocusColor: Int = Color.BLACK
-    private var rightAnswerColor: Int = Color.BLACK
+    private var rightAnswerColor: Int = Color.GREEN
+    private var wrongAnswerColor: Int = Color.RED
     private var isFixedUnderlineWidth: Boolean = true
     private var underlineFixedWidth: Int = 100
     //下划线集合
@@ -39,7 +40,7 @@ class FillBlankView : RelativeLayout {
     private var editRectF: RectF? = null
     private var fontTop = 0f
     private var fontBottom = 0f
-    private var showRightAnswer = false
+    private var showAnswerResult = false
     private var keyboardListener: KeyboardListener? = null
 
     constructor(context: Context?) : super(context)
@@ -65,6 +66,8 @@ class FillBlankView : RelativeLayout {
                 ?: underlineUnFocusColor
         rightAnswerColor =
             array?.getColor(R.styleable.FillBlankView_right_answer_color, rightAnswerColor) ?: rightAnswerColor
+        wrongAnswerColor =
+            array?.getColor(R.styleable.FillBlankView_wrong_answer_color, wrongAnswerColor) ?: wrongAnswerColor
         isFixedUnderlineWidth = array?.getBoolean(R.styleable.FillBlankView_underline_fixed_width, true) ?: true
         underlineFixedWidth =
             array?.getDimensionPixelSize(R.styleable.FillBlankView_underline_fixed_width_size, underlineFixedWidth)
@@ -111,17 +114,27 @@ class FillBlankView : RelativeLayout {
         if (tag.equals(FillBlankTagUtil.TAG_BLANK, true) && opening) {
             val attrs = FillBlankTagUtil.processAttribute(xmlReader)
             val rightAnswers = attrs[FillBlankTagUtil.ATTR_RIGHT_ANSWER]
+            val userAnswer = attrs[FillBlankTagUtil.ATTR_USER_ANSWER]
+            val result = judgeAnswerResult(rightAnswers, userAnswer)
             val span =
                 UnderlineSpan(underlineFocusColor, underlineUnFocusColor, isFixedUnderlineWidth || rightAnswers == null)
             span.setFixedWidth(underlineFixedWidth)
             span.rightAnswers = rightAnswers
             span.clickListener = clickSpanListener
-            span.spanText = ""
+            span.spanText = userAnswer ?: ""
             span.spanId = spanList.size
+            span.showAnswerResult = showAnswerResult
+
+            if (showAnswerResult) {
+                span.rightColor = rightAnswerColor
+                span.wrongColor = wrongAnswerColor
+                span.answerResult = result
+            }
+
             spanList.add(span)
             output.setSpan(span, output.length - 1, output.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-            if (showRightAnswer) {
+            if (showAnswerResult && !result) {
                 val spannableString = SpannableString("($rightAnswers)")
                 spannableString.setSpan(
                     ForegroundColorSpan(rightAnswerColor),
@@ -132,6 +145,20 @@ class FillBlankView : RelativeLayout {
                 output.append(spannableString)
             }
         }
+    }
+
+    /**
+     * 判断正误
+     */
+    private fun judgeAnswerResult(rightAnswers: String?, userAnswer: String?): Boolean {
+        if (!showAnswerResult) {
+            return false
+        }
+        if (rightAnswers.isNullOrEmpty() || userAnswer.isNullOrEmpty()) {
+            return false
+        }
+        val rightAnswerArr = rightAnswers.split(FillBlankTagUtil.RIGHT_ANSWER_SPLIT)
+        return rightAnswerArr.contains(userAnswer)
     }
 
     private fun reset() {
@@ -236,8 +263,8 @@ class FillBlankView : RelativeLayout {
     /**
      * 显示正确答案
      */
-    fun showRightAnswer(showRightAnswer: Boolean) {
-        this.showRightAnswer = showRightAnswer
+    fun showAnswerResult(showAnswerResult: Boolean) {
+        this.showAnswerResult = showAnswerResult
         doFillBlank()
     }
 

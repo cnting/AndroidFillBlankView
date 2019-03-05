@@ -10,5 +10,6 @@
         <attr name="underline_fixed_width_size" format="dimension"/> <!--下划线的宽度-->
         <attr name="underline_fixed_width" format="boolean"/> <!--下划线是否固定宽度-->
         <attr name="right_answer_color" format="color"/>  <!--正确答案的颜色-->
+        <attr name="wrong_answer_color" format="color"/>  <!--错误答案的颜色-->
     </declare-styleable>
 </resources>

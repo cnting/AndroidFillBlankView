@@ -6,7 +6,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 
 // 处理焦点
-object ImmFocus {
+internal object ImmFocus {
     // 显示/隐藏
     fun show(bOn: Boolean, focus: View?): Boolean {
         if (focus == null) {

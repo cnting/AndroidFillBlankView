@@ -14,7 +14,7 @@ import android.widget.TextView
  * Created by cnting on 2019-02-28
  * 用来绘制填空题
  */
-class UnderlineSpan(
+internal class UnderlineSpan(
     private val underlineFocusColor: Int,
     private val underlineUnFocusColor: Int,
     private val isFixedUnderlineWidth: Boolean  //是否固定下划线宽度
@@ -27,7 +27,11 @@ class UnderlineSpan(
     var spanId: Int = 0
     var underlineWidth = 80
     var clickListener: ClickSpanListener? = null
-    var rightAnswers: String? = null  //正确答案，用逗号分割
+    var rightAnswers: String? = null  //正确答案，用;分割
+    var showAnswerResult: Boolean = false
+    var rightColor: Int = Color.GREEN
+    var wrongColor: Int = Color.RED
+    var answerResult: Boolean = false
     private var drawPaint = Paint()
     private val linePaint = Paint()
 
@@ -76,6 +80,10 @@ class UnderlineSpan(
         var width = paint.measureText(ellipsize, 0, ellipsize.length)
         width = (underlineWidth - width) / 2
 
+        if (showAnswerResult) {
+            drawPaint.color = if (answerResult) rightColor else wrongColor
+        }
+
         drawPaint.textSize = paint.textSize
         canvas.drawText(ellipsize, 0, ellipsize.length, x + width, y.toFloat(), drawPaint) //绘制填写的内容
 
@@ -88,7 +96,7 @@ class UnderlineSpan(
      */
     private fun getUnderlineWidth(paint: Paint): Int {
         if (!isFixedUnderlineWidth && rightAnswers?.isNotEmpty() == true) {
-            val answers = rightAnswers!!.split(";")
+            val answers = rightAnswers!!.split(FillBlankTagUtil.RIGHT_ANSWER_SPLIT)
             var maxLengthAnswer = answers[0]
             (0 until answers.size)
                 .forEach {

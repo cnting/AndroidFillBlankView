@@ -1,14 +1,11 @@
 package com.cnting.android_fillblankview
 
 import android.os.Bundle
-import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 import com.cnting.fillblankview.FillBlankTagUtil
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         init4()
 
         fab.setOnClickListener {
-            fillBlankView1.autoNextBlank()
+            fillBlankView1.autoNextBlank()  //点击自动跳转下一个空
 //            val stringBuilder = StringBuilder()
 //            stringBuilder.append("1:\n")
 //            stringBuilder.append(fillBlankView1.getUserAnswers().joinToString(",") + "\n")
@@ -52,12 +49,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init4() {
-        val answer1 = FillBlankTagUtil.blankToHtml(listOf("sheep"))
-        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves"))
+        val answer1 = FillBlankTagUtil.blankToHtml(listOf("sheep", "a sheep"), "sheep")
+        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves"), "leafs")
         val content =
             "A group of $answer1(sheep) are eating grass and $answer2 (leaf) in front of the farm."
         fillBlankView4.setFillContent(content, "")
-        fillBlankView4.showRightAnswer(true)
+        fillBlankView4.showAnswerResult(true)
+        fillBlankView4.isEnabled = false
     }
 
 }
