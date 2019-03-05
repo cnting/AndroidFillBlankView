@@ -3,8 +3,6 @@
     <declare-styleable name="FillBlankView">
         <attr name="fill_text" format="string"/>
         <attr name="fill_split" format="string"/>
-        <attr name="fill_text_size" format="dimension"/>
-        <attr name="fill_text_color" format="color"/>
         <attr name="underline_focus_color" format="color"/>
         <attr name="underline_unfocus_color" format="color"/>
         <attr name="underline_fixed_width_size" format="dimension"/> <!--下划线的宽度-->

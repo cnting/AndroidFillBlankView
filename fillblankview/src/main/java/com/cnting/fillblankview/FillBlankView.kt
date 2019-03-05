@@ -1,19 +1,27 @@
 package com.cnting.fillblankview
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Build
-import android.text.*
+import android.text.Html
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
+import android.view.View.OnFocusChangeListener
+import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
-import kotlinx.android.synthetic.main.view_fill_blank.view.*
+import androidx.core.view.setPadding
+
 
 /**
  * Created by cnting on 2019-02-28
@@ -25,8 +33,6 @@ class FillBlankView : RelativeLayout {
     private var fillContent: String = ""
     //下划线分隔符
     private var fillSplit: String = ""
-    private var textColor: Int = 0
-    private var textSize: Int = 20
     private var underlineFocusColor: Int = Color.BLACK
     private var underlineUnFocusColor: Int = Color.BLACK
     private var rightAnswerColor: Int = Color.GREEN
@@ -42,6 +48,8 @@ class FillBlankView : RelativeLayout {
     private var fontBottom = 0f
     private var showAnswerResult = false
     private var keyboardListener: KeyboardListener? = null
+    private var fillBlankTextView: TextView? = null
+    private var fillBlankEditText: EditText? = null
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
@@ -53,12 +61,9 @@ class FillBlankView : RelativeLayout {
     }
 
     private fun init(context: Context?, attrs: AttributeSet?) {
-        View.inflate(context, R.layout.view_fill_blank, this)
         val array = context?.obtainStyledAttributes(attrs, R.styleable.FillBlankView)
         fillContent = array?.getString(R.styleable.FillBlankView_fill_text) ?: ""
         fillSplit = array?.getString(R.styleable.FillBlankView_fill_split) ?: ""
-        textColor = array?.getColor(R.styleable.FillBlankView_fill_text_color, textColor) ?: textColor
-        textSize = array?.getDimensionPixelSize(R.styleable.FillBlankView_fill_text_size, textSize) ?: textSize
         underlineFocusColor =
             array?.getColor(R.styleable.FillBlankView_underline_focus_color, underlineFocusColor) ?: underlineFocusColor
         underlineUnFocusColor =
@@ -73,6 +78,36 @@ class FillBlankView : RelativeLayout {
             array?.getDimensionPixelSize(R.styleable.FillBlankView_underline_fixed_width_size, underlineFixedWidth)
                 ?: underlineFixedWidth
         array?.recycle()
+    }
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        if (childCount != 1 || getChildAt(0) !is TextView) {
+            throw Throwable("FillBlankView can host only one TextView child")
+        } else {
+            fillBlankTextView = getChildAt(0) as TextView
+            if (fillBlankTextView!!.paddingBottom == 0) {
+                fillBlankTextView!!.setPadding(   //设置底部padding，让最后一行下划线显示完全
+                    fillBlankTextView!!.paddingLeft,
+                    fillBlankTextView!!.paddingTop,
+                    fillBlankTextView!!.paddingRight,
+                    TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        2f,
+                        Resources.getSystem().displayMetrics
+                    ).toInt()
+                )
+            }
+
+            fillBlankEditText = EditText(context)
+            fillBlankEditText!!.layoutParams =
+                RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            fillBlankEditText!!.gravity = Gravity.CENTER
+            fillBlankEditText!!.setBackgroundColor(Color.TRANSPARENT)
+            fillBlankEditText!!.setTextSize(TypedValue.COMPLEX_UNIT_PX, fillBlankTextView!!.textSize)
+            fillBlankEditText?.setPadding(0)   //内容显示不全问题
+            addView(fillBlankEditText)
+        }
 
         initView()
 
@@ -80,17 +115,15 @@ class FillBlankView : RelativeLayout {
     }
 
     private fun initView() {
-        fillBlankTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize.toFloat())
-        fillBlankTextView.setTextColor(textColor)
-        fillBlankTextView.movementMethod = UnderlineLinkMovementMethod()
-        fillBlankEditText.onFocusChangeListener = OnFocusChangeListener { v, hasFocus ->
+        fillBlankTextView!!.movementMethod = UnderlineLinkMovementMethod()
+        fillBlankEditText!!.onFocusChangeListener = OnFocusChangeListener { v, hasFocus ->
             if (!hasFocus && lastSpan != null) {
-                lastSpan?.spanText = fillBlankEditText.text.toString()
+                lastSpan?.spanText = fillBlankEditText!!.text.toString()
                 lastSpan?.focusChange(false)
-                fillBlankEditText.setText("")
-                fillBlankEditText.visibility = View.INVISIBLE
+                fillBlankEditText!!.setText("")
+                fillBlankEditText!!.visibility = View.INVISIBLE
                 lastSpan = null
-                fillBlankTextView.invalidate()
+                fillBlankTextView!!.invalidate()
             }
         }
     }
@@ -105,7 +138,7 @@ class FillBlankView : RelativeLayout {
             Html.fromHtml(fillContent, imageGetter, tagHandler)
         }
 
-        fillBlankTextView.text = spanned
+        fillBlankTextView!!.text = spanned
     }
 
     private val imageGetter by lazy { FillBlankImageGetter(context) }
@@ -170,7 +203,7 @@ class FillBlankView : RelativeLayout {
             if (!isEnabled) {
                 return
             }
-            fillBlankEditText.visibility = View.VISIBLE
+            fillBlankEditText!!.visibility = View.VISIBLE
             if (lastSpan != span) {
                 fillTextOnLoseFocus()
             }
@@ -178,14 +211,14 @@ class FillBlankView : RelativeLayout {
 
             spanList.forEach { it.focusChange(false) }
             span.focusChange(true)
-            fillBlankTextView.invalidate()
+            fillBlankTextView!!.invalidate()
         }
     }
 
     private fun fillTextOnNewFocus(span: UnderlineSpan) {
         lastSpan = span
-        fillBlankEditText.setText(span.spanText)
-        fillBlankEditText.setSelection(span.spanText.length)
+        fillBlankEditText!!.setText(span.spanText)
+        fillBlankEditText!!.setSelection(span.spanText.length)
         span.spanText = ""
         //计算当前EditText应该显示的位置
         val rectF = drawSpanRect(span)
@@ -194,20 +227,20 @@ class FillBlankView : RelativeLayout {
 
     private fun fillTextOnLoseFocus() {
         if (lastSpan != null) {
-            lastSpan?.spanText = fillBlankEditText.text.toString()
+            lastSpan?.spanText = fillBlankEditText!!.text.toString()
         }
     }
 
     private fun drawSpanRect(span: UnderlineSpan): RectF {
-        val layout = fillBlankTextView.layout
-        val buffer: Spannable = fillBlankTextView.text as Spannable
+        val layout = fillBlankTextView!!.layout
+        val buffer: Spannable = fillBlankTextView!!.text as Spannable
         val start = buffer.getSpanStart(span)
         val end = buffer.getSpanEnd(span)
         var line = layout.getLineForOffset(start)
 
         if (editRectF == null) {
             editRectF = RectF()
-            val fontMetrics = fillBlankTextView.paint.fontMetrics
+            val fontMetrics = fillBlankTextView!!.paint.fontMetrics
             fontTop = fontMetrics.ascent
             fontBottom = fontMetrics.descent
         }
@@ -221,16 +254,16 @@ class FillBlankView : RelativeLayout {
     }
 
     private fun layoutEditTextPosition(rectF: RectF) {
-        val layoutParams = fillBlankEditText.layoutParams as RelativeLayout.LayoutParams
+        val layoutParams = fillBlankEditText!!.layoutParams as RelativeLayout.LayoutParams
         layoutParams.width = (rectF.right - rectF.left).toInt()
         layoutParams.height = (rectF.bottom - rectF.top).toInt()
-        layoutParams.leftMargin = (fillBlankTextView.left + rectF.left).toInt()
-        layoutParams.topMargin = (fillBlankTextView.top + rectF.top).toInt()
+        layoutParams.leftMargin = (fillBlankTextView!!.left + rectF.left).toInt()
+        layoutParams.topMargin = (fillBlankTextView!!.top + rectF.top).toInt()
 
-        fillBlankEditText.layoutParams = layoutParams
-        fillBlankEditText.isFocusable = true
-        fillBlankEditText.requestFocus()
-        showOrHideKeyboard(true, fillBlankEditText)
+        fillBlankEditText!!.layoutParams = layoutParams
+        fillBlankEditText!!.isFocusable = true
+        fillBlankEditText!!.requestFocus()
+        showOrHideKeyboard(true, fillBlankEditText!!)
     }
 
     /**
@@ -280,14 +313,14 @@ class FillBlankView : RelativeLayout {
      */
     fun autoNextBlank() {
         if (lastSpan == null) {
-            clickSpanListener.onClick(fillBlankTextView, 0, spanList[0])
+            clickSpanListener.onClick(fillBlankTextView!!, 0, spanList[0])
         } else {
             val index = spanList.indexOf(lastSpan!!)
             when {
                 index == spanList.size - 1 -> //如果是最后一个，关闭键盘
-                    showOrHideKeyboard(false, fillBlankEditText)
-                index < 0 -> clickSpanListener.onClick(fillBlankTextView, 0, spanList[0])
-                else -> clickSpanListener.onClick(fillBlankTextView, index + 1, spanList[index + 1])
+                    showOrHideKeyboard(false, fillBlankEditText!!)
+                index < 0 -> clickSpanListener.onClick(fillBlankTextView!!, 0, spanList[0])
+                else -> clickSpanListener.onClick(fillBlankTextView!!, index + 1, spanList[index + 1])
             }
         }
     }

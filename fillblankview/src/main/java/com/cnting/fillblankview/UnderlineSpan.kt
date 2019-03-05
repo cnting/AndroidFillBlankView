@@ -82,6 +82,8 @@ internal class UnderlineSpan(
 
         if (showAnswerResult) {
             drawPaint.color = if (answerResult) rightColor else wrongColor
+        } else {
+            drawPaint.color = underlineUnFocusColor
         }
 
         drawPaint.textSize = paint.textSize
