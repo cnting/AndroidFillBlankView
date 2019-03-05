@@ -30,7 +30,7 @@ internal class UnderlineLinkMovementMethod : LinkMovementMethod() {
 
             val spanArr = buffer?.getSpans(off, off, UnderlineSpan::class.java)
             if (spanArr?.isNotEmpty() == true) {
-                spanArr[0].onClick(widget, buffer, action == MotionEvent.ACTION_DOWN, x, y, line, off)
+                spanArr[0].onClick(widget)
                 return true
             }
         }

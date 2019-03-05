@@ -101,7 +101,7 @@ class UnderlineSpan(
         return underlineWidth
     }
 
-    fun onClick(textView: TextView, buffer: Spannable, isDown: Boolean, x: Int, y: Int, line: Int, off: Int) {
+    fun onClick(textView: TextView) {
         if (clickListener != null) {
             clickListener?.onClick(textView, spanId, this)
         }

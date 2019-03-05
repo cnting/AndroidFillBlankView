@@ -39,8 +39,8 @@ class FillBlankView : RelativeLayout {
     private var editRectF: RectF? = null
     private var fontTop = 0f
     private var fontBottom = 0f
-    private var immFocus: ImmFocus? = null
     private var showRightAnswer = false
+    private var keyboardListener: KeyboardListener? = null
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
@@ -91,7 +91,6 @@ class FillBlankView : RelativeLayout {
             }
         }
     }
-
 
     private fun doFillBlank() {
         if (fillSplit.isNotEmpty()) {
@@ -204,14 +203,25 @@ class FillBlankView : RelativeLayout {
         fillBlankEditText.layoutParams = layoutParams
         fillBlankEditText.isFocusable = true
         fillBlankEditText.requestFocus()
-        showImm(true, fillBlankEditText)
+        showOrHideKeyboard(true, fillBlankEditText)
     }
 
-    private fun showImm(open: Boolean, focusView: View) {
-        if (open) {
-            ImmFocus.show(open, focusView)
+    /**
+     * 控制键盘
+     */
+    fun setKeyboardListener(listener: KeyboardListener) {
+        this.keyboardListener = listener
+    }
+
+    private fun showOrHideKeyboard(open: Boolean, focusView: View) {
+        if (keyboardListener != null) {
+            if (open) {
+                keyboardListener?.showKeyboard(focusView)
+            } else {
+                keyboardListener?.hideKeyboard(focusView)
+            }
         } else {
-            ImmFocus.show(open, null)
+            ImmFocus.show(open, focusView)
         }
     }
 
@@ -223,13 +233,41 @@ class FillBlankView : RelativeLayout {
         doFillBlank()
     }
 
+    /**
+     * 显示正确答案
+     */
     fun showRightAnswer(showRightAnswer: Boolean) {
         this.showRightAnswer = showRightAnswer
         doFillBlank()
     }
 
+    /**
+     * 获取用户答案
+     */
     fun getUserAnswers(): List<String> {
         return spanList.map { it.spanText }
     }
 
+    /**
+     * 自动跳下一个空
+     */
+    fun autoNextBlank() {
+        if (lastSpan == null) {
+            clickSpanListener.onClick(fillBlankTextView, 0, spanList[0])
+        } else {
+            val index = spanList.indexOf(lastSpan!!)
+            when {
+                index == spanList.size - 1 -> //如果是最后一个，关闭键盘
+                    showOrHideKeyboard(false, fillBlankEditText)
+                index < 0 -> clickSpanListener.onClick(fillBlankTextView, 0, spanList[0])
+                else -> clickSpanListener.onClick(fillBlankTextView, index + 1, spanList[index + 1])
+            }
+        }
+    }
+
+    interface KeyboardListener {
+        fun showKeyboard(focusView: View)
+
+        fun hideKeyboard(focusView: View)
+    }
 }

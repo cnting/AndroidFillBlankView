@@ -22,16 +22,17 @@ class MainActivity : AppCompatActivity() {
         init4()
 
         fab.setOnClickListener {
-            val stringBuilder = StringBuilder()
-            stringBuilder.append("1:\n")
-            stringBuilder.append(fillBlankView1.getUserAnswers().joinToString(",") + "\n")
-            stringBuilder.append("2:\n")
-            stringBuilder.append(fillBlankView2.getUserAnswers().joinToString(",") + "\n")
-            stringBuilder.append("3:\n")
-            stringBuilder.append(fillBlankView3.getUserAnswers().joinToString(",") + "\n")
-            stringBuilder.append("4:\n")
-            stringBuilder.append(fillBlankView4.getUserAnswers().joinToString(",") + "\n")
-            Log.d("FillBlank", stringBuilder.toString())
+            fillBlankView1.autoNextBlank()
+//            val stringBuilder = StringBuilder()
+//            stringBuilder.append("1:\n")
+//            stringBuilder.append(fillBlankView1.getUserAnswers().joinToString(",") + "\n")
+//            stringBuilder.append("2:\n")
+//            stringBuilder.append(fillBlankView2.getUserAnswers().joinToString(",") + "\n")
+//            stringBuilder.append("3:\n")
+//            stringBuilder.append(fillBlankView3.getUserAnswers().joinToString(",") + "\n")
+//            stringBuilder.append("4:\n")
+//            stringBuilder.append(fillBlankView4.getUserAnswers().joinToString(",") + "\n")
+//            Log.d("FillBlank", stringBuilder.toString())
         }
     }
 
