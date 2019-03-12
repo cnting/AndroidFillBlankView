@@ -19,7 +19,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.view.setPadding
 
 
 /**
@@ -64,15 +63,19 @@ class FillBlankView : RelativeLayout {
         fillContent = array?.getString(R.styleable.FillBlankView_fill_text) ?: ""
         fillSplit = array?.getString(R.styleable.FillBlankView_fill_split) ?: ""
         underlineFocusColor =
-            array?.getColor(R.styleable.FillBlankView_underline_focus_color, underlineFocusColor) ?: underlineFocusColor
+            array?.getColor(R.styleable.FillBlankView_underline_focus_color, underlineFocusColor)
+                ?: underlineFocusColor
         underlineUnFocusColor =
             array?.getColor(R.styleable.FillBlankView_underline_unfocus_color, underlineUnFocusColor)
                 ?: underlineUnFocusColor
         rightAnswerColor =
-            array?.getColor(R.styleable.FillBlankView_right_answer_color, rightAnswerColor) ?: rightAnswerColor
+            array?.getColor(R.styleable.FillBlankView_right_answer_color, rightAnswerColor)
+                ?: rightAnswerColor
         wrongAnswerColor =
-            array?.getColor(R.styleable.FillBlankView_wrong_answer_color, wrongAnswerColor) ?: wrongAnswerColor
-        isFixedUnderlineWidth = array?.getBoolean(R.styleable.FillBlankView_underline_fixed_width, true) ?: true
+            array?.getColor(R.styleable.FillBlankView_wrong_answer_color, wrongAnswerColor)
+                ?: wrongAnswerColor
+        isFixedUnderlineWidth = array?.getBoolean(R.styleable.FillBlankView_underline_fixed_width, true)
+            ?: true
         underlineFixedWidth =
             array?.getDimensionPixelSize(R.styleable.FillBlankView_underline_fixed_width_size, underlineFixedWidth)
                 ?: underlineFixedWidth
@@ -104,7 +107,8 @@ class FillBlankView : RelativeLayout {
             fillBlankEditText!!.gravity = Gravity.CENTER
             fillBlankEditText!!.setBackgroundColor(Color.TRANSPARENT)
             fillBlankEditText!!.setTextSize(TypedValue.COMPLEX_UNIT_PX, fillBlankTextView!!.textSize)
-            fillBlankEditText?.setPadding(0)   //内容显示不全问题
+            fillBlankEditText?.setPadding(0, 0, 0, 0)   //内容显示不全问题
+            fillBlankEditText?.setTextColor(underlineFocusColor)
             addView(fillBlankEditText)
         }
 
@@ -121,8 +125,12 @@ class FillBlankView : RelativeLayout {
                 lastSpan?.focusChange(false)
                 fillBlankEditText!!.setText("")
                 fillBlankEditText!!.visibility = View.INVISIBLE
-                lastSpan = null
+
+                val spannableText = fillBlankTextView!!.text as Spannable
+                spannableText.setSpan(lastSpan, lastSpan!!.startIndex, lastSpan!!.endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 fillBlankTextView!!.invalidate()
+
+                lastSpan = null
             }
         }
     }
@@ -137,7 +145,7 @@ class FillBlankView : RelativeLayout {
             Html.fromHtml(fillContent, imageGetter, tagHandler)
         }
 
-        fillBlankTextView!!.text = spanned
+        fillBlankTextView!!.setText(spanned, TextView.BufferType.SPANNABLE)
     }
 
     private val imageGetter by lazy { FillBlankImageGetter(context) }
@@ -162,6 +170,8 @@ class FillBlankView : RelativeLayout {
                 span.wrongColor = wrongAnswerColor
                 span.answerResult = result
             }
+            span.startIndex = output.length - 1
+            span.endIndex = output.length
 
             spanList.add(span)
             output.setSpan(span, output.length - 1, output.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -210,6 +220,11 @@ class FillBlankView : RelativeLayout {
 
             spanList.forEach { it.focusChange(false) }
             span.focusChange(true)
+
+            val spannableText = fillBlankTextView!!.text as Spannable
+            spanList.forEach {
+                spannableText.setSpan(it, it.startIndex, it.endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
             fillBlankTextView!!.invalidate()
         }
     }
@@ -272,7 +287,7 @@ class FillBlankView : RelativeLayout {
         this.keyboardListener = listener
     }
 
-    private fun showOrHideKeyboard(open: Boolean, focusView: View) {
+    private fun showOrHideKeyboard(open: Boolean, focusView: EditText) {
         if (keyboardListener != null) {
             if (open) {
                 keyboardListener?.showKeyboard(focusView)
@@ -281,6 +296,10 @@ class FillBlankView : RelativeLayout {
             }
         } else {
             ImmFocus.show(open, focusView)
+        }
+
+        if (!open) {
+            fillBlankEditText?.clearFocus()
         }
     }
 
@@ -311,22 +330,31 @@ class FillBlankView : RelativeLayout {
      * 自动跳下一个空
      */
     fun autoNextBlank() {
-        if (lastSpan == null) {
-            clickSpanListener.onClick(fillBlankTextView!!, 0, spanList[0])
-        } else {
-            val index = spanList.indexOf(lastSpan!!)
-            when {
-                index == spanList.size - 1 -> //如果是最后一个，关闭键盘
-                    showOrHideKeyboard(false, fillBlankEditText!!)
-                index < 0 -> clickSpanListener.onClick(fillBlankTextView!!, 0, spanList[0])
-                else -> clickSpanListener.onClick(fillBlankTextView!!, index + 1, spanList[index + 1])
+        if (spanList.isEmpty()) {
+            return
+        }
+        post {
+            if (lastSpan == null) {
+                clickSpanListener.onClick(fillBlankTextView!!, 0, spanList[0])
+            } else {
+                val index = spanList.indexOf(lastSpan!!)
+                when {
+                    index == spanList.size - 1 -> //如果是最后一个，关闭键盘
+                        showOrHideKeyboard(false, fillBlankEditText!!)
+                    index < 0 -> clickSpanListener.onClick(fillBlankTextView!!, 0, spanList[0])
+                    else -> clickSpanListener.onClick(fillBlankTextView!!, index + 1, spanList[index + 1])
+                }
             }
         }
     }
 
-    interface KeyboardListener {
-        fun showKeyboard(focusView: View)
+    fun forceHideKeyboard() {
+        showOrHideKeyboard(false, fillBlankEditText!!)
+    }
 
-        fun hideKeyboard(focusView: View)
+    interface KeyboardListener {
+        fun showKeyboard(focusView: EditText)
+
+        fun hideKeyboard(focusView: EditText)
     }
 }

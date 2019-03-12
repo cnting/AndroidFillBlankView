@@ -3,11 +3,9 @@ package com.cnting.fillblankview
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.text.Spannable
 import android.text.TextPaint
 import android.text.TextUtils
 import android.text.style.ReplacementSpan
-import android.util.Log
 import android.widget.TextView
 
 /**
@@ -32,6 +30,8 @@ internal class UnderlineSpan(
     var rightColor: Int = Color.GREEN
     var wrongColor: Int = Color.RED
     var answerResult: Boolean = false
+    var startIndex = -1
+    var endIndex = -1
     private var drawPaint = Paint()
     private val linePaint = Paint()
 
