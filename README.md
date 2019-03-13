@@ -1,10 +1,12 @@
+<img src='https://img.shields.io/bintray/v/cnting77/maven/FillBlankView.svg'/>
+
 # AndroidFillBlankView 填空题
 参考 https://github.com/TMLAndroid/FillBlankDemo
 
 ## 使用方式
 1. 添加依赖
 ```gradle
-implementation 'com.cnting:fillblankview:0.0.1'
+implementation 'com.cnting:fillblankview:version'
 ```
 2. 布局中添加
 ```xml
