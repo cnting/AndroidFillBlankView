@@ -1,6 +1,7 @@
 package com.cnting.fillblankview
 
 import org.xml.sax.XMLReader
+import java.lang.StringBuilder
 
 /**
  * Created by cnting on 2019-03-01
@@ -11,15 +12,29 @@ object FillBlankTagUtil {
     const val TAG_BLANK = "fillblank"
     const val ATTR_RIGHT_ANSWER = "rightanswer"
     const val ATTR_USER_ANSWER = "useranswer"
+    const val ATTR_IS_RIGHT = "isright"
     const val RIGHT_ANSWER_SPLIT = "/"
 
     /**
      * 拼接成<fillblank rightanswer='answer1/answer2/answer3' userAnswer='userAnswer'>
-     * 一个空可能有多个正确答案
+     * @param rightAnswers 一个空可能有多个正确答案
+     * @param userAnswer 用户输入的答案
+     * @param isRight 是否正确，如果不输入，则判断内容是否相等
      */
-    fun blankToHtml(rightAnswers: List<String>, userAnswer: String = ""): String {
+    fun blankToHtml(rightAnswers: List<String>, userAnswer: String = "", isRight: Boolean? = null): String {
         val answers = rightAnswers.joinToString(RIGHT_ANSWER_SPLIT)
-        return "&nbsp;<$TAG_BLANK $ATTR_RIGHT_ANSWER='$answers' $ATTR_USER_ANSWER='$userAnswer'>&nbsp;"
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("&nbsp;")
+        stringBuilder.append("<")
+        stringBuilder.append(TAG_BLANK)
+        stringBuilder.append(" $ATTR_RIGHT_ANSWER='$answers' ")
+        stringBuilder.append(" $ATTR_USER_ANSWER='$userAnswer' ")
+        if (isRight != null) {
+            stringBuilder.append(" $ATTR_IS_RIGHT='$isRight' ")
+        }
+        stringBuilder.append(">")
+        stringBuilder.append("&nbsp;")
+        return stringBuilder.toString()
     }
 
     /**

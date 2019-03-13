@@ -71,7 +71,7 @@ def siteUrl = 'https://github.com/cnting/AndroidFillBlankView'   // 项目的主
 def gitUrl = 'https://github.com/cnting/AndroidFillBlankView.git'   // Git仓库的url
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
-version = "0.0.1" //发布版本号
+version = "0.0.3" //发布版本号
 group = "com.cnting" //最终引用形式，如compile 'com.piano.demolib:1.0.0'，其中demolib在后面配置
 
 bintray {
@@ -86,10 +86,10 @@ bintray {
         userOrg = 'cnting77' //自己创建的organization名称，一定要全是小写字母，即使当时创建的名称含有大写，这里全部转换为小写，否则404
         publish = true // 是否是公开项目，公开别人可以引用
         version {
-            name = '0.0.1'
+            name = "0.0.3"
             desc = 'android fill blank view'//描述，自己定义
             released  = new Date()
-            vcsTag = 'v0.0.1'
+            vcsTag = 'v0.0.3'
 //            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
         }
     }

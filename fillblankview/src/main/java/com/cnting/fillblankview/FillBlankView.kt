@@ -127,7 +127,12 @@ class FillBlankView : RelativeLayout {
                 fillBlankEditText!!.visibility = View.INVISIBLE
 
                 val spannableText = fillBlankTextView!!.text as Spannable
-                spannableText.setSpan(lastSpan, lastSpan!!.startIndex, lastSpan!!.endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableText.setSpan(
+                    lastSpan,
+                    lastSpan!!.startIndex,
+                    lastSpan!!.endIndex,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
                 fillBlankTextView!!.invalidate()
 
                 lastSpan = null
@@ -155,7 +160,11 @@ class FillBlankView : RelativeLayout {
             val attrs = FillBlankTagUtil.processAttribute(xmlReader)
             val rightAnswers = attrs[FillBlankTagUtil.ATTR_RIGHT_ANSWER]
             val userAnswer = attrs[FillBlankTagUtil.ATTR_USER_ANSWER]
-            val result = judgeAnswerResult(rightAnswers, userAnswer)
+            val isRightFromUser = attrs[FillBlankTagUtil.ATTR_IS_RIGHT]
+            val result = isRightFromUser?.toBoolean() ?: judgeAnswerResult(
+                rightAnswers,
+                userAnswer
+            )
             val span =
                 UnderlineSpan(underlineFocusColor, underlineUnFocusColor, isFixedUnderlineWidth || rightAnswers == null)
             span.setFixedWidth(underlineFixedWidth)

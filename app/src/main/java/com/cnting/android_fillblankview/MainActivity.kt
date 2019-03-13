@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun init4() {
         val answer1 = FillBlankTagUtil.blankToHtml(listOf("sheep", "a sheep"), "sheep")
-        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves", "leaffff"), "leafs")
+        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves", "leaffff"), "leafs",false)
         val content =
             "A group of $answer1(sheep) are eating grass and $answer2 (leaf) in front of the farm."
         fillBlankView4.setFillContent(content, "")
