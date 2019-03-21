@@ -59,6 +59,7 @@ private fun init3() {
 ```
 
 #### 4. 根据用户填写内容判断对错？
+调用`FillBlankTagUtil.blankToHtml(rightAnswers:List<String>,userAnswer:String,isRight:Boolean?)`转化成html
 ```kotlin
 private fun init4() {
     val answer1 = FillBlankTagUtil.blankToHtml(listOf("sheep", "a sheep"), "sheep")
