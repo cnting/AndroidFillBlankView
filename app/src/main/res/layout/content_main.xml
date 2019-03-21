@@ -34,6 +34,7 @@
         <TextView
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
+                android:lineSpacingMultiplier="1.4"
                 android:textSize="16sp"/>
     </com.cnting.fillblankview.FillBlankView>
 
@@ -60,6 +61,7 @@
         <TextView
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
+                android:lineSpacingMultiplier="1.4"
                 android:textSize="16sp"/>
     </com.cnting.fillblankview.FillBlankView>
     <TextView
@@ -86,6 +88,7 @@
             android:layout_height="wrap_content">
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                   android:textSize="16sp"
+                  android:lineSpacingMultiplier="1.4"
                   android:textColor="@android:color/black"/>
     </com.cnting.fillblankview.FillBlankView>
     <TextView
@@ -114,6 +117,6 @@
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
-                android:lineSpacingMultiplier="1.3"/>
+                android:lineSpacingMultiplier="1.4"/>
     </com.cnting.fillblankview.FillBlankView>
 </androidx.constraintlayout.widget.ConstraintLayout>

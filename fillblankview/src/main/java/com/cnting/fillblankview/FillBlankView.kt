@@ -88,18 +88,18 @@ class FillBlankView : RelativeLayout {
             throw Throwable("FillBlankView can host only one TextView child")
         } else {
             fillBlankTextView = getChildAt(0) as TextView
-//            if (fillBlankTextView!!.paddingBottom == 0) {
-//                fillBlankTextView!!.setPadding(   //设置底部padding，让最后一行下划线显示完全
-//                    fillBlankTextView!!.paddingLeft,
-//                    fillBlankTextView!!.paddingTop,
-//                    fillBlankTextView!!.paddingRight,
-//                    TypedValue.applyDimension(
-//                        TypedValue.COMPLEX_UNIT_DIP,
-//                        2f,
-//                        Resources.getSystem().displayMetrics
-//                    ).toInt()
-//                )
-//            }
+            if (fillBlankTextView!!.paddingBottom == 0) {
+                fillBlankTextView!!.setPadding(   //设置底部padding，让最后一行下划线显示完全
+                    fillBlankTextView!!.paddingLeft,
+                    fillBlankTextView!!.paddingTop,
+                    fillBlankTextView!!.paddingRight,
+                    TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        2f,
+                        Resources.getSystem().displayMetrics
+                    ).toInt()
+                )
+            }
 
             fillBlankEditText = EditText(context)
             fillBlankEditText!!.layoutParams =

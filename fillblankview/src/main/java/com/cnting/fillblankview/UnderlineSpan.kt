@@ -67,9 +67,6 @@ internal class UnderlineSpan(
         bottom: Int,
         paint: Paint
     ) {
-        val bottom1 = paint.fontMetrics.bottom
-        val y1 = y + bottom1 - underlineStrokeWidth
-
         val ellipsize =
             TextUtils.ellipsize(
                 spanText,
@@ -90,6 +87,8 @@ internal class UnderlineSpan(
         drawPaint.textSize = paint.textSize
         canvas.drawText(ellipsize, 0, ellipsize.length, x + width, y.toFloat(), drawPaint) //绘制填写的内容
 
+        val bottom1 = paint.fontMetrics.bottom
+        val y1 = y + bottom1 - underlineStrokeWidth
         linePaint.color = drawPaint.color
         canvas.drawLine(x, y1, x + underlineWidth, y1, linePaint)   //绘制下划线
     }
