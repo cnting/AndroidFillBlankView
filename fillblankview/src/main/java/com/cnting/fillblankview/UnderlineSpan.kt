@@ -32,13 +32,14 @@ internal class UnderlineSpan(
     var answerResult: Boolean = false
     var startIndex = -1
     var endIndex = -1
+    val underlineStrokeWidth = 2f
     private var drawPaint = Paint()
     private val linePaint = Paint()
 
     init {
         drawPaint.color = underlineUnFocusColor
         linePaint.color = drawPaint.color
-        linePaint.strokeWidth = 2f
+        linePaint.strokeWidth = underlineStrokeWidth
     }
 
     fun setFixedWidth(fixedWidth: Int) {
@@ -67,7 +68,7 @@ internal class UnderlineSpan(
         paint: Paint
     ) {
         val bottom1 = paint.fontMetrics.bottom
-        val y1 = y + bottom1
+        val y1 = y + bottom1 - underlineStrokeWidth
 
         val ellipsize =
             TextUtils.ellipsize(
