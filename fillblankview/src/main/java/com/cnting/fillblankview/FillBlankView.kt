@@ -44,7 +44,12 @@ class FillBlankView : RelativeLayout {
     private var editRectF: RectF? = null
     private var fontTop = 0f
     private var fontBottom = 0f
-    private var showAnswerResult = false
+    private var showUserAnswer = true     //显示用户输入内容
+    private var showAnswerResult = false  //显示对错及正确答案
+        set(value) {
+            if (value) showUserAnswer = true
+            field = value
+        }
     private var keyboardListener: KeyboardListener? = null
     private var fillBlankTextView: TextView? = null
     private var fillBlankEditText: EditText? = null
@@ -170,7 +175,7 @@ class FillBlankView : RelativeLayout {
             span.setFixedWidth(underlineFixedWidth)
             span.rightAnswers = rightAnswers
             span.clickListener = clickSpanListener
-            span.spanText = userAnswer ?: ""
+            span.spanText = if (showUserAnswer) userAnswer ?: "" else ""
             span.spanId = spanList.size
             span.showAnswerResult = showAnswerResult
 
@@ -325,6 +330,11 @@ class FillBlankView : RelativeLayout {
      */
     fun showAnswerResult(showAnswerResult: Boolean) {
         this.showAnswerResult = showAnswerResult
+        doFillBlank()
+    }
+
+    fun showUserAnswer(showUserAnswer: Boolean) {
+        this.showUserAnswer = showUserAnswer
         doFillBlank()
     }
 

@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         val content =
             "A group of $answer1(sheep) are eating grass and $answer2 (leaf) in front of the farm."
         fillBlankView4.setFillContent(content, "")
+//        fillBlankView4.showUserAnswer(false)
         fillBlankView4.showAnswerResult(true)
         fillBlankView4.isEnabled = false
     }
