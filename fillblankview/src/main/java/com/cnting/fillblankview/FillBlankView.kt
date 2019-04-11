@@ -15,6 +15,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.RelativeLayout
@@ -123,7 +124,8 @@ class FillBlankView : RelativeLayout {
     }
 
     private fun initView() {
-        fillBlankTextView!!.movementMethod = UnderlineLinkMovementMethod()
+        val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+        fillBlankTextView!!.movementMethod = UnderlineLinkMovementMethod(touchSlop)
         fillBlankEditText!!.onFocusChangeListener = OnFocusChangeListener { v, hasFocus ->
             if (!hasFocus && lastSpan != null) {
                 lastSpan?.spanText = fillBlankEditText!!.text.toString()
