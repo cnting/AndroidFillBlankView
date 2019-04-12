@@ -1,8 +1,10 @@
 package com.cnting.android_fillblankview
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity;
 import com.cnting.fillblankview.FillBlankTagUtil
+import com.cnting.fillblankview.FillBlankView
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -39,6 +41,11 @@ class MainActivity : AppCompatActivity() {
         val content =
             "A group of $answer1(sheep) are eating grass and $answer2 (leaf) in front of the farm."
         fillBlankView2.setFillContent(content, "")
+        fillBlankView2.setOnBlankFocusChangeListener(object : FillBlankView.OnBlankFocusChangeListener {
+            override fun onLoseFocus(index: Int, spanText: String?) {
+                Log.d("onLoseFocus", "index:$index,spanText:$spanText")
+            }
+        })
     }
 
     private fun init3() {
@@ -50,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun init4() {
         val answer1 = FillBlankTagUtil.blankToHtml(listOf("sheep", "a sheep"), "sheep")
-        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves", "leaffff"), "leafs",false)
+        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves", "leaffff"), "leafs", false)
         val content =
             "A group of $answer1(sheep) are eating grass and $answer2 (leaf) in front of the farm."
         fillBlankView4.setFillContent(content, "")

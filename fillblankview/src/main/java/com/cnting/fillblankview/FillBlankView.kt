@@ -11,6 +11,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -52,6 +53,7 @@ class FillBlankView : RelativeLayout {
             field = value
         }
     private var keyboardListener: KeyboardListener? = null
+    private var onBlankFocusChangeListener: OnBlankFocusChangeListener? = null
     private var fillBlankTextView: TextView? = null
     private var fillBlankEditText: EditText? = null
 
@@ -123,12 +125,20 @@ class FillBlankView : RelativeLayout {
         doFillBlank()
     }
 
+    private val spannableFactory = object : Spannable.Factory() {
+        override fun newSpannable(source: CharSequence?): Spannable {
+            return source as Spannable
+        }
+    }
+
     private fun initView() {
         val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
         fillBlankTextView!!.movementMethod = UnderlineLinkMovementMethod(touchSlop)
+        fillBlankTextView!!.setSpannableFactory(spannableFactory)
+
         fillBlankEditText!!.onFocusChangeListener = OnFocusChangeListener { v, hasFocus ->
             if (!hasFocus && lastSpan != null) {
-                lastSpan?.spanText = fillBlankEditText!!.text.toString()
+                fillTextOnLoseFocus()
                 lastSpan?.focusChange(false)
                 fillBlankEditText!!.setText("")
                 fillBlankEditText!!.visibility = View.INVISIBLE
@@ -220,6 +230,7 @@ class FillBlankView : RelativeLayout {
     }
 
     private fun reset() {
+        lastSpan = null
         spanList.clear()
     }
 
@@ -241,7 +252,8 @@ class FillBlankView : RelativeLayout {
             spanList.forEach {
                 spannableText.setSpan(it, it.startIndex, it.endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
-            fillBlankTextView!!.invalidate()
+//            fillBlankTextView!!.invalidate()
+            fillBlankTextView!!.requestLayout()  //invalidate()有时候不刷新，暂时用requestLayout()
         }
     }
 
@@ -258,6 +270,7 @@ class FillBlankView : RelativeLayout {
     private fun fillTextOnLoseFocus() {
         if (lastSpan != null) {
             lastSpan?.spanText = fillBlankEditText!!.text.toString()
+            onBlankFocusChangeListener?.onLoseFocus(lastSpan?.spanId ?: -1, lastSpan?.spanText)
         }
     }
 
@@ -299,8 +312,12 @@ class FillBlankView : RelativeLayout {
     /**
      * 控制键盘
      */
-    fun setKeyboardListener(listener: KeyboardListener) {
+    fun setKeyboardListener(listener: KeyboardListener?) {
         this.keyboardListener = listener
+    }
+
+    fun setOnBlankFocusChangeListener(listener: OnBlankFocusChangeListener?) {
+        this.onBlankFocusChangeListener = listener
     }
 
     private fun showOrHideKeyboard(open: Boolean, focusView: EditText) {
@@ -377,5 +394,12 @@ class FillBlankView : RelativeLayout {
         fun showKeyboard(focusView: EditText)
 
         fun hideKeyboard(focusView: EditText)
+    }
+
+    /**
+     * 每个空失去焦点时调用
+     */
+    interface OnBlankFocusChangeListener {
+        fun onLoseFocus(index: Int, spanText: String?)
     }
 }
