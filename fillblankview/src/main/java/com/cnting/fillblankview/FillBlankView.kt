@@ -16,11 +16,13 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.View.inflate
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
+import kotlinx.android.synthetic.main.fillblank_edittext.view.*
 
 
 /**
@@ -108,16 +110,11 @@ class FillBlankView : RelativeLayout {
                     ).toInt()
                 )
             }
-
-            fillBlankEditText = EditText(context)
-            fillBlankEditText!!.layoutParams =
-                RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            fillBlankEditText!!.gravity = Gravity.CENTER
-            fillBlankEditText!!.setBackgroundColor(Color.TRANSPARENT)
-            fillBlankEditText!!.setTextSize(TypedValue.COMPLEX_UNIT_PX, fillBlankTextView!!.textSize)
+            val v = View.inflate(context, R.layout.fillblank_edittext, this)
+            fillBlankEditText = v.fillBlankEditText
+            fillBlankEditText?.setTextSize(TypedValue.COMPLEX_UNIT_PX, fillBlankTextView!!.textSize)
             fillBlankEditText?.setPadding(0, 0, 0, 0)   //内容显示不全问题
             fillBlankEditText?.setTextColor(underlineFocusColor)
-            addView(fillBlankEditText)
         }
 
         initView()
@@ -239,7 +236,6 @@ class FillBlankView : RelativeLayout {
             if (!isEnabled) {
                 return
             }
-            fillBlankEditText!!.visibility = View.VISIBLE
             if (lastSpan != span) {
                 fillTextOnLoseFocus()
             }
@@ -259,6 +255,7 @@ class FillBlankView : RelativeLayout {
 
     private fun fillTextOnNewFocus(span: UnderlineSpan) {
         lastSpan = span
+        fillBlankEditText!!.visibility = View.VISIBLE
         fillBlankEditText!!.setText(span.spanText)
         fillBlankEditText!!.setSelection(span.spanText.length)
         span.spanText = ""
