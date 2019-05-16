@@ -57,9 +57,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun init4() {
         val answer1 = FillBlankTagUtil.blankToHtml(listOf("sheep", "a sheep"), "sheep")
-        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves", "leaffff"), "leafs", false)
+        val answer2 = FillBlankTagUtil.blankToHtml(listOf("leaves", "leave's"), "leaf's", true)
+        Log.d("FillBlank", "answer2:$answer2")
         val content =
-            "A group of $answer1(sheep) are eating grass and $answer2 (leaf) in front of the farm."
+            "A group of $answer1(sheep) are eating grass and $answer2 (leaves) in front of the farm."
         fillBlankView4.setFillContent(content, "")
 //        fillBlankView4.showUserAnswer(false)
         fillBlankView4.showAnswerResult(true)

@@ -1,5 +1,6 @@
 package com.cnting.fillblankview
 
+import android.text.TextUtils
 import org.xml.sax.XMLReader
 import java.lang.StringBuilder
 
@@ -22,13 +23,13 @@ object FillBlankTagUtil {
      * @param isRight 是否正确，如果不输入，则判断内容是否相等
      */
     fun blankToHtml(rightAnswers: List<String>, userAnswer: String = "", isRight: Boolean? = null): String {
-        val answers = rightAnswers.joinToString(RIGHT_ANSWER_SPLIT)
+        val answers = rightAnswers.joinToString(RIGHT_ANSWER_SPLIT) { htmlEncode(it) }
         val stringBuilder = StringBuilder()
         stringBuilder.append("&nbsp;")
         stringBuilder.append("<")
         stringBuilder.append(TAG_BLANK)
         stringBuilder.append(" $ATTR_RIGHT_ANSWER='$answers' ")
-        stringBuilder.append(" $ATTR_USER_ANSWER='$userAnswer' ")
+        stringBuilder.append(" $ATTR_USER_ANSWER='${htmlEncode(userAnswer)}' ")
         if (isRight != null) {
             stringBuilder.append(" $ATTR_IS_RIGHT='$isRight' ")
         }
@@ -36,6 +37,11 @@ object FillBlankTagUtil {
         stringBuilder.append("&nbsp;")
         return stringBuilder.toString()
     }
+
+    private fun htmlEncode(str: String): String {
+        return TextUtils.htmlEncode(str)
+    }
+
 
     /**
      * 分隔符变成下划线
